@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en" layout:decorate="~{layout/base}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/assets/attachment/attachment.css}">
+</head>
+<body>
+<main layout:fragment="content">
+
+    <div class="wa-container">
+        <div class="wa-stack wa-gap-s">
+
+            <div id="tableContent" th:fragment="tableContent">
+
+                <wa-card>
+
+                    <wa-progress-bar id="loading-indicator" indeterminate class="htmx-indicator"></wa-progress-bar>
+
+                    <div class="wa-stack wa-gap-m">
+
+                        <div th:if="${#lists.isEmpty(attachments)}" class="wa-center">
+
+                            <div class="wa-stack wa-gap-m wa-center empty-attachments">
+                                <wa-icon name="document-text" class="empty-icon"></wa-icon>
+                                <h3 class="wa-heading-m" th:text="#{no_attachments_found}"/>
+                            </div>
+
+                        </div>
+
+                        <wa-scroller>
+
+                            <table id="attachmentTable" class="attachment-table"
+                                   th:unless="${#lists.isEmpty(attachments)}">
+                                <thead>
+                                <tr>
+                                    <th th:text="#{id}">ID</th>
+                                    <th th:text="#{filename}">Filename</th>
+                                    <th th:text="#{mimetype}">Mime Type</th>
+                                    <th th:text="#{created_at}">Created At</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="attachment : ${attachments}"
+                                    th:onclick="|window.location.href='/attachment/pdf/view/${attachment.id}'|"
+                                    class="clickable-row">
+                                    <td th:text="${attachment.id}"/>
+                                    <td th:text="${attachment.filename}"/>
+                                    <td th:text="${attachment.mimetype}"/>
+                                    <td th:text="${#temporals.format(attachment.createdAt, 'dd.MM.yyyy')}"/>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </wa-scroller>
+                    </div>
+                </wa-card>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

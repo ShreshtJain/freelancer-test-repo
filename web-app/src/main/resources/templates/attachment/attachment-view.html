@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en" layout:decorate="~{layout/base}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/assets/attachment/attachment-view.css}">
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="wa-container">
+        <div class="wa-stack wa-gap-s">
+            <wa-card>
+                <div slot="header">
+                    <div class="header-wrapper">
+                        <!-- Heading -->
+                        <h2 class="pdf-heading" th:text="'Viewing: ' + ${filename}"></h2>
+
+                        <!-- Pager Controls -->
+                        <div id="pager" class="pager-buttons">
+                            <button data-pager="prev" class="pager-button">Prev</button>
+                            <button data-pager="next" class="pager-button">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wa-stack">
+                    <div role="toolbar" id="toolbar" class="toolbar-wrapper">
+                        <!-- Page Mode -->
+                        <div id="page-mode" class="wa-cluster wa-gap-xs">
+                            <label>
+                                Page Mode
+                                <input type="number" value="1" min="1" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </wa-card>
+
+            <div id="app" th:attr="data-id=${id}">
+                <div id="viewport-container">
+                    <div role="main" id="viewport"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="scripts">
+    <!-- PDF.js library latest version-->
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@latest/build/pdf.min.js"></script>
+    <script th:src="@{/assets/attachment/attachment.js}"></script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,59 @@
+/* Header Layout */
+.header-wrapper {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+/* Heading Style */
+.pdf-heading {
+    text-align: left;
+    flex: 1;
+    font-weight: 600;
+    margin: 0;
+    word-break: break-word;
+}
+
+/* Pager Button Group */
+.pager-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+/* Pager Buttons Style */
+.pager-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.pager-button:hover {
+    background-color: #0056b3;
+}
+
+/* Toolbar Container */
+.toolbar-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* PDF Viewport Container */
+#viewport-container {
+    overflow: auto;
+    max-height: 100vh;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+    box-sizing: border-box;
+}
