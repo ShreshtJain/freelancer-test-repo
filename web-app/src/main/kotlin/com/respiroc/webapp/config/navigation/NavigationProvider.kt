@@ -48,7 +48,7 @@ class NavigationProvider {
             ),
 
             NavigationSection(
-                title = "Attachments", icon = "receipt",
+                title = "Attachments", icon = "file-pdf",
                 items = listOf(
                     NavigationSectionItem(label = "PDFs", url = "/attachment/pdf")
                 )
