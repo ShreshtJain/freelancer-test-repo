@@ -45,6 +45,11 @@ wa-copy-button::part(button) {
     background-color: var(--wa-color-surface-raised);
 }
 
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
 
 @media (max-width: 768px) {

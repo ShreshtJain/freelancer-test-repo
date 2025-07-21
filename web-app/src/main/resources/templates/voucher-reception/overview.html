@@ -8,20 +8,35 @@
 <main layout:fragment="content">
     <div class="r-voucher-reception-container">
         <wa-callout variant="neutral" class="r-voucher-reception">
-            <h1 class="wa-heading-xl" th:text="#{voucher_reception}" />
+
+            <div class="form-actions" style="margin-top: var(--wa-space-m); display: flex; justify-content: space-between; align-items: flex-start;">
+                <h1 class="wa-heading-xl" th:text="#{voucher_reception}"></h1>
+
+                <form th:hx-post="'/htmx/voucher-reception'" th:hx-target="'#tableContent'"
+                      th:hx-indicator="'#loading-indicator'" th:hx-trigger="'change'"
+                      enctype="multipart/form-data" style="margin: 0;">
+
+                    <input type="file" id="fileInput" name="files" accept=".pdf,.png,.jpg" multiple style="display: none;"/>
+
+                    <wa-button
+                            size="small" variant="brand" appearance="accent"
+                            onclick="document.getElementById('fileInput').click(); return false;"
+                            th:text="#{voucher_upload_files}">
+                    </wa-button>
+                </form>
+            </div>
 
             <p class="wa-text">
                 <span th:text="#{voucher_reception_info}" />
                 <wa-tag variant="brand" appearance="accent">
-                    <span th:text="${tenantSlug + '@ea.reai.no'}" /><wa-copy-button th:value="${tenantSlug + '@ea.reai.no'}"></wa-copy-button>
+                    <span th:text="${tenantSlug + '@ea.reai.no'}"></span>
+                    <wa-copy-button th:value="${tenantSlug + '@ea.reai.no'}"></wa-copy-button>
                 </wa-tag>
             </p>
         </wa-callout>
 
-
-
-        <div style="overflow-x: auto;">
-
+        <div id="tableContent" th:fragment="tableContent" style="overflow-x: auto;">
+            <wa-progress-bar id="loading-indicator" indeterminate class="htmx-indicator"></wa-progress-bar>
             <table class="r-voucher-reception-table">
                 <thead>
                 <tr>

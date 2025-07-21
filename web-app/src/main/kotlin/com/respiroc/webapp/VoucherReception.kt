@@ -4,9 +4,12 @@ import com.respiroc.tenant.application.TenantService
 import com.respiroc.tenant.domain.model.Tenant
 import com.respiroc.util.repository.CustomJpaRepository
 import com.respiroc.webapp.controller.BaseController
+import com.respiroc.webapp.controller.response.Callout
+import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.slf4j.LoggerFactory
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.stereotype.Repository
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import java.time.Instant
 import java.util.*
 
@@ -142,4 +146,58 @@ class VoucherReceptionWebController(
         model.addAttribute("tenantSlug", springUser.ctx.currentTenant?.tenantSlug)
         return "voucher-reception/overview"
     }
+}
+
+@Controller
+@RequestMapping("/htmx/voucher-reception")
+class VoucherReceptionHTMXWebController(
+    private val voucherReceptionDocumentRepository: VoucherReceptionDocumentRepository,
+    private val voucherReceptionService: VoucherReceptionService,
+    private val tenantService: TenantService
+) : BaseController() {
+
+    private val logger = LoggerFactory.getLogger(VoucherReceptionController::class.java)
+
+    @PostMapping(value = ["", "/"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @HxRequest
+    fun receiveDocumentFromUI(
+        @RequestParam("files") files: List<MultipartFile>,
+        model: Model
+    ): String {
+        val springUser = springUser()
+
+        val tenantSlug = springUser.ctx.currentTenant?.tenantSlug
+        if (tenantSlug == null) {
+            model.addAttribute(calloutAttributeName, Callout.Error("Tenant slug not found."))
+            return "fragments/callout-message"
+        }
+        logger.info("Receiving Voucher Receipt for $tenantSlug")
+        val tenant = tenantService.findTenantBySlug(tenantSlug)
+        if (tenant == null) {
+            model.addAttribute(calloutAttributeName, Callout.Error("Company not found for tenant: $tenantSlug"))
+            return "fragments/callout-message"
+        }
+
+        try {
+            files.forEach { file ->
+                voucherReceptionService.saveDocument(
+                    fileData = file.bytes,
+                    filename = file.originalFilename ?: "unknown",
+                    mimeType = file.contentType ?: "application/octet-stream",
+                    senderEmail = springUser.ctx.email,
+                    tenant = tenant
+                )
+            }
+        } catch (e: Exception) {
+            model.addAttribute(calloutAttributeName, Callout.Error("Failed to save voucher: ${e.message}"))
+            return "fragments/callout-message"
+        }
+        model.addAttribute(calloutAttributeName, Callout.Success("Voucher uploaded successfully"))
+
+        val documents = voucherReceptionDocumentRepository.findAll()
+        model.addAttribute("documents", documents)
+
+        return "voucher-reception/overview :: tableContent"
+    }
+
 }
