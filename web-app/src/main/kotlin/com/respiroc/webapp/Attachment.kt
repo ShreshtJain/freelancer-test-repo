@@ -139,5 +139,5 @@ class AttachmentService {
 
 
     private fun ensurePdfExt(name: String): String =
-        if (name.lowercase().endsWith(".pdf")) name else "${name.substringBeforeLast('.', name)}.pdf"
+        if (name.lowercase().endsWith(".pdf.pdfjs.pdfjs")) name else "${name.substringBeforeLast('.', name)}.pdf.pdfjs.pdfjs"
 }

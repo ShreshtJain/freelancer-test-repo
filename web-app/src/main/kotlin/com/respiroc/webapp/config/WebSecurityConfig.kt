@@ -51,6 +51,7 @@ class WebSecurityConfig {
                     .requestMatchers(*publicPaths).permitAll()
                     .anyRequest().authenticated()
             }
+            .headers { it.frameOptions { frame -> frame.sameOrigin() } }
             .cors { }
             .csrf { it.disable() }
             .httpBasic { it.disable() }

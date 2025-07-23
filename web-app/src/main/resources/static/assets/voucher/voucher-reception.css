@@ -2,7 +2,6 @@
     background: var(--wa-color-surface-default);
     border-radius: 12px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
 }
 
 .r-voucher-reception{
@@ -18,7 +17,15 @@ wa-copy-button::part(button) {
     transition: none;
     animation: none;
 }
-
+.close-pane-button {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: rotate(-90deg) translateY(50%);
+    transform-origin: left center;
+    z-index: 10;
+    white-space: nowrap;
+}
 
 .r-voucher-reception-table {
     width: 100%;
@@ -44,6 +51,9 @@ wa-copy-button::part(button) {
 .r-voucher-reception-table tr:hover {
     background-color: var(--wa-color-surface-raised);
 }
+.r-voucher-reception-table tr.selected {
+  background-color: var(--wa-color-surface-raised);
+}
 
 .form-actions {
     display: flex;
@@ -51,6 +61,12 @@ wa-copy-button::part(button) {
     align-items: center;
 }
 
+.gutter {
+    background: transparent;
+    cursor: col-resize;
+    width:15px;
+    transition: background 0.2s ease;
+}
 
 @media (max-width: 768px) {
 

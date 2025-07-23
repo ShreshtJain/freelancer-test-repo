@@ -9,6 +9,8 @@ import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 import java.util.*
 
@@ -36,7 +39,7 @@ class VoucherReceptionController(
         val senderEmail: String
     )
 
-    // Cloudflare worker in index.js calls this
+    // Cloudflare worker in index.pdfjs calls this
     @PostMapping("/api/voucher-reception")
     fun receiveDocumentFromEmail(
         @RequestHeader("X-Tenant-Slug") tenantSlug: String,
@@ -146,6 +149,19 @@ class VoucherReceptionWebController(
         model.addAttribute("tenantSlug", springUser.ctx.currentTenant?.tenantSlug)
         return "voucher-reception/overview"
     }
+
+    @GetMapping(value = ["/{id}"])
+    fun getAttachment(@PathVariable id: Long): ResponseEntity<ByteArray?> {
+        val document = voucherReceptionDocumentRepository.findById(id)
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found") }
+
+        val attachment = document.attachment
+        return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType(attachment.mimetype))
+            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"${attachment.filename}\"")
+            .body(attachment.fileData)
+    }
+
 }
 
 @Controller

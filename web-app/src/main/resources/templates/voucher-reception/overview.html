@@ -3,71 +3,94 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <link rel="stylesheet" th:href="@{/assets/voucher/voucher-reception.css}">
+<!--    <th:block th:replace="~{fragments/r-combobox :: r-combobox-dependencies}"></th:block>-->
 </head>
 <body>
 <main layout:fragment="content">
-    <div class="r-voucher-reception-container">
-        <wa-callout variant="neutral" class="r-voucher-reception">
+    <!-- SPLIT VIEW CONTAINER -->
+    <div id="split-container" style="display:flex; height: 100vh; overflow: hidden;">
+        <!-- LEFT: Pane -->
+        <div id="left-pane" class="pane" style="flex: 1; min-width: 0;overflow: auto;">
+            <div class="r-voucher-reception-container" >
+                <wa-callout variant="neutral" class="r-voucher-reception">
 
-            <div class="form-actions" style="margin-top: var(--wa-space-m); display: flex; justify-content: space-between; align-items: flex-start;">
-                <h1 class="wa-heading-xl" th:text="#{voucher_reception}"></h1>
+                    <div class="form-actions" style="margin-top: var(--wa-space-m); display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h1 class="wa-heading-xl" th:text="#{voucher_reception}"></h1>
 
-                <form th:hx-post="'/htmx/voucher-reception'" th:hx-target="'#tableContent'"
-                      th:hx-indicator="'#loading-indicator'" th:hx-trigger="'change'"
-                      enctype="multipart/form-data" style="margin: 0;">
+                        <form th:hx-post="'/htmx/voucher-reception'" th:hx-target="'#tableContent'"
+                              th:hx-indicator="'#loading-indicator'" th:hx-trigger="'change'"
+                              enctype="multipart/form-data" style="margin: 0;">
 
-                    <input type="file" id="fileInput" name="files" accept=".pdf,.png,.jpg" multiple style="display: none;"/>
+                            <input type="file" id="fileInput" name="files" accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp" multiple style="display: none; "/>
 
-                    <wa-button
-                            size="small" variant="brand" appearance="accent"
-                            onclick="document.getElementById('fileInput').click(); return false;"
-                            th:text="#{voucher_upload_files}">
-                    </wa-button>
-                </form>
-            </div>
+                            <wa-button
+                                    size="small" variant="brand" appearance="accent"
+                                    onclick="document.getElementById('fileInput').click(); return false;"
+                                    th:text="#{voucher_upload_files}">
+                            </wa-button>
+                        </form>
+                    </div>
 
-            <p class="wa-text">
-                <span th:text="#{voucher_reception_info}" />
-                <wa-tag variant="brand" appearance="accent">
-                    <span th:text="${tenantSlug + '@ea.reai.no'}"></span>
-                    <wa-copy-button th:value="${tenantSlug + '@ea.reai.no'}"></wa-copy-button>
-                </wa-tag>
-            </p>
-        </wa-callout>
+                    <p class="wa-text">
+                        <span th:text="#{voucher_reception_info}" />
+                        <wa-tag variant="brand" appearance="accent">
+                            <span th:text="${tenantSlug + '@ea.reai.no'}"></span>
+                            <wa-copy-button th:value="${tenantSlug + '@ea.reai.no'}"></wa-copy-button>
+                        </wa-tag>
+                    </p>
+                </wa-callout>
 
-        <div id="tableContent" th:fragment="tableContent" style="overflow-x: auto;">
-            <wa-progress-bar id="loading-indicator" indeterminate class="htmx-indicator"></wa-progress-bar>
-            <table class="r-voucher-reception-table">
-                <thead>
-                <tr>
-                    <th th:text="#{filename}" />
-                    <th th:text="#{sender_email}" />
-                    <th th:text="#{mime_type}" />
-                    <th th:text="#{received}" />
-                    <th th:text="#{file_created_at}" />
+                <div id="tableContent" th:fragment="tableContent" style="overflow-x: auto;">
+                    <wa-progress-bar id="loading-indicator" indeterminate class="htmx-indicator"></wa-progress-bar>
+                    <table class="r-voucher-reception-table">
+                        <thead>
+                        <tr>
+                            <th th:text="#{filename}" />
+                            <th th:text="#{sender_email}" />
+                            <th th:text="#{mime_type}" />
+                            <th th:text="#{received}" />
+                            <th th:text="#{file_created_at}" />
 
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="document : ${documents}">
-                    <td th:text="${document.attachment.filename}"/>
-                    <td th:text="${document.senderEmail ?: '-'}"/>
-                    <td th:text="${document.attachment.mimetype}"/>
-                    <td th:text="${#temporals.format(document.receivedAt, 'dd.MM.yyyy HH:mm')}"/>
-                    <td th:text="${#temporals.format(document.attachment.createdAt, 'dd.MM.yyyy HH:mm')}"/>
-                </tr>
-                </tbody>
-            </table>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="document : ${documents}"  class="clickable-row" th:onclick="|showPreview(this)|"
+                            th:data-id="${document.id}">
+                            <td th:text="${document.attachment.filename}"/>
+                            <td th:text="${document.senderEmail ?: '-'}"/>
+                            <td th:text="${document.attachment.mimetype}"/>
+                            <td th:text="${#temporals.format(document.receivedAt, 'dd.MM.yyyy HH:mm')}"/>
+                            <td th:text="${#temporals.format(document.attachment.createdAt, 'dd.MM.yyyy HH:mm')}"/>
+                        </tr>
+                        </tbody>
+                    </table>
 
-            <div class="wa-center" th:if="${#lists.isEmpty(documents)}">
-                <div class="wa-stack wa-center wa-gap-m">
-                    <wa-icon name="document-text" style="font-size: 3rem; opacity: 0.5;"></wa-icon>
-                    <h2 class="wa-heading-m" th:text="#{no_voucher_reception_found}" />
+                    <div class="wa-center" th:if="${#lists.isEmpty(documents)}">
+                        <div class="wa-stack wa-center wa-gap-m">
+                            <wa-icon name="document-text" style="font-size: 3rem; opacity: 0.5;"></wa-icon>
+                            <h2 class="wa-heading-m" th:text="#{no_voucher_reception_found}" />
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
+        <!-- RIGHT: Pane -->
+        <div id="right-pane" class="pane" style="display: none; position: relative;">
+            <wa-button id="close-pane-button" class="close-pane-button" appearance="accent" variant="brand" size="small" with-caret
+                       onclick="document.getElementById('right-pane').style.display='none'"
+                       th:text="#{close_voucher_reception_document}">
+            </wa-button>
+            <div id="preview-content" style="height: 100%;">
+                <iframe id="pdf-viewer-frame" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
         </div>
     </div>
 </main>
+
+<th:block layout:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/split.js@latest/split.min.js"></script>
+    <script th:src="@{/assets/voucher/voucher-reception.js}"></script>
+</th:block>
 </body>
 </html>
